@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="fa" class="light-style layout-navbar-fixed layout-menu-fixed" dir="rtl" data-theme="theme-default"
+      data-assets-path="https://admin.parkwaykala.ir/assets" data-template="vertical-menu-template">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <title>لیست اقساط | مدیریت اقساط </title>
+
+    <meta name="description" content="">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="https://admin.parkwaykala.ir/icon.png">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href=" https://admin.parkwaykala.ir/assets/vendor/fonts/boxicons.css">
+    <link rel="stylesheet" href=" https://admin.parkwaykala.ir/assets/vendor/fonts/fontawesome.css">
+
+
+    <!-- Core CSS -->
+<link rel="stylesheet" href="https://admin.parkwaykala.ir/assets/vendor/css/rtl/core.css" class="template-customizer-core-css">
+<link rel="stylesheet" href="https://admin.parkwaykala.ir/assets/vendor/css/rtl/theme-default.css" class="template-customizer-theme-css">
+<link rel="stylesheet" href="https://admin.parkwaykala.ir/assets/css/demo.css">
+<link rel="stylesheet" href="https://admin.parkwaykala.ir/assets/vendor/css/rtl/rtl.css">
+
+<link rel="stylesheet" href="https://admin.parkwaykala.ir/assets/css/toastr.min.css" />
+<style>
+    /* Override toastr success style */
+    #toast-container > .toast-success {
+        background-color: #28a745 !important; /* Bootstrap success green */
+        color: #fff !important;
+    }
+    .toast-error {
+        background-color: #d00606 !important; /* Change this to the desired red color */
+        color: #ffffff !important; /* Ensure text is readable */
+    }
+
+    .card-header-px-0{
+        padding: 0 1.375rem !important;
+    }
+</style>
+
+
+<style>
+    /* Style for the loading overlay */
+    #loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6); /* dark transparent background */
+        z-index: 9999; /* Ensure it overlays everything */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+    /* Spinner or loading animation */
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 8px dotted #fff982; /* Dotted border */
+        border-radius: 50%; /* Circle shape */
+        animation: spin 1.6s linear infinite;
+        box-sizing: border-box;
+    }
+
+    /* Spinner animation */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Hide overlay when not visible */
+    #loading-overlay.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+</style>
+
+<style>
+    .print-only,.print-only-header{
+       display: none;
+    }
+    .unless-print{
+        display: initial;
+    }
+    @media print {
+
+        .print-only{
+            display: initial;
+        }
+        .unless-print{
+            display: none!important;
+        }
+        .print-only-header{
+            display: flex;
+        }
+    }
+</style>
+
+    <style>
+        @media print {
+            .watermark {
+                position: fixed;
+                top: 40%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(-30deg);
+                font-size: 60px;
+                color: rgba(0, 0, 0, 0.1);
+                white-space: nowrap;
+                pointer-events: none;
+                z-index: 9999;
+                display: block!important;
+            }
+        }
+        .watermark{
+            display: none;
+        }
+    </style>
+    <!-- Page CSS -->
+
+    <!-- Helpers -->
+    <script src=" https://admin.parkwaykala.ir/assets/vendor/js/helpers.js"></script>
+
+    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+    <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
+    <script src=" https://admin.parkwaykala.ir/assets/vendor/js/template-customizer.js"></script>
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src=" https://admin.parkwaykala.ir/assets/vendor/js/config.js"></script>
+
+
+<script type="text/javascript" class="flasher-js">(function() {    var rootScript = 'https://cdn.jsdelivr.net/npm/@flasher/flasher@1.3.2/dist/flasher.min.js';    var FLASHER_FLASH_BAG_PLACE_HOLDER = {};    var options = mergeOptions([], FLASHER_FLASH_BAG_PLACE_HOLDER);    function mergeOptions(first, second) {        return {            context: merge(first.context || {}, second.context || {}),            envelopes: merge(first.envelopes || [], second.envelopes || []),            options: merge(first.options || {}, second.options || {}),            scripts: merge(first.scripts || [], second.scripts || []),            styles: merge(first.styles || [], second.styles || []),        };    }    function merge(first, second) {        if (Array.isArray(first) && Array.isArray(second)) {            return first.concat(second).filter(function(item, index, array) {                return array.indexOf(item) === index;            });        }        return Object.assign({}, first, second);    }    function renderOptions(options) {        if(!window.hasOwnProperty('flasher')) {            console.error('Flasher is not loaded');            return;        }        requestAnimationFrame(function () {            window.flasher.render(options);        });    }    function render(options) {        if ('loading' !== document.readyState) {            renderOptions(options);            return;        }        document.addEventListener('DOMContentLoaded', function() {            renderOptions(options);        });    }    if (1 === document.querySelectorAll('script.flasher-js').length) {        document.addEventListener('flasher:render', function (event) {            render(event.detail);        });            }    if (window.hasOwnProperty('flasher') || !rootScript || document.querySelector('script[src="' + rootScript + '"]')) {        render(options);    } else {        var tag = document.createElement('script');        tag.setAttribute('src', rootScript);        tag.setAttribute('type', 'text/javascript');        tag.onload = function () {            render(options);        };        document.head.appendChild(tag);    }})();</script>
+</head>
+<body>   <!-- Loading Overlay -->
+<div id="loading-overlay" class="hidden">
+    <div class="spinner"></div>
+</div>
+<!-- Layout wrapper -->
+<div class="layout-wrapper layout-content-navbar">
+    <div class="layout-container">
+        <!-- Menu -->
+
+        <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme unless-print">
+
+    <a href="http://localhost">
+        <img src="https://admin.parkwaykala.ir/logo.png" style="max-height: 81px;max-width: 259px">
+    </a>
+
+
+    <ul class="menu-inner py-1">
+        <!-- Dashboards -->
+        <li class="menu-item">
+            <a href="https://admin.parkwaykala.ir/admin/dashboard" class="menu-link ">
+                <i class="menu-icon tf-icons bx bxs-dashboard"></i>
+                <div>داشبورد</div>
+            </a>
+        </li>
+
+        <!-- users -->
+        <li class="menu-item ">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bxs-group"></i>
+                <div>کاربران</div>
+            </a>
+
+            <ul class="menu-sub">
+                <li class="menu-item  ">
+                    <a href="https://admin.parkwaykala.ir/admin/users" class="menu-link">
+                        <div>لیست کاربران</div>
+                    </a>
+                </li>
+                <li class="menu-item ">
+                    <a href="https://admin.parkwaykala.ir/admin/users/create" class="menu-link ">
+                        <div>افزودن کاربر</div>
+                    </a>
+                </li>
+                <li class="menu-item ">
+                    <a href="https://admin.parkwaykala.ir/admin/users/roles" class="menu-link ">
+                        <div>مدیریت نقش کاربران</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- loans -->
+        <li class="menu-item open">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bxs-folder"></i>
+                <div>پرونده ها</div>
+            </a>
+
+            <ul class="menu-sub">
+                <li class="menu-item ">
+                    <a href="https://admin.parkwaykala.ir/admin/loans" class="menu-link ">
+                        <div>لیست پرونده ها</div>
+                    </a>
+                </li>
+                <li class="menu-item ">
+                    <a href="https://admin.parkwaykala.ir/admin/loans/settled" class="menu-link ">
+                        <div>پرونده های تسویه شده</div>
+                    </a>
+                </li>
+                <li class="menu-item ">
+                    <a href="https://admin.parkwaykala.ir/admin/loans/create" class="menu-link">
+                        <div>افزودن پرونده</div>
+                    </a>
+                </li>
+
+                <li class="menu-item ">
+                    <a href="https://admin.parkwaykala.ir/admin/archives" class="menu-link">
+                        <div>حذفیات</div>
+                    </a>
+                </li>
+
+                <li class="menu-item ">
+                    <a href="https://admin.parkwaykala.ir/admin/loans/old" class="menu-link">
+                        <div>پرونده های قدیمی</div>
+                    </a>
+                </li>
+
+                <li class="menu-item ">
+                    <a href="https://admin.parkwaykala.ir/admin/loans/delinquent" class="menu-link">
+                        <div>پرونده های معوق</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- installments -->
+        <li class="menu-item open">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons fa fa-money-bill"></i>
+                <div>اقساط</div>
+            </a>
+
+            <ul class="menu-sub">
+                <li class="menu-item ">
+                    <a href="https://admin.parkwaykala.ir/admin/installments/index" class="menu-link">
+                        <div>همه</div>
+                    </a>
+                </li>
+
+                <li class="menu-item ">
+                    <a href="https://admin.parkwaykala.ir/admin/installments/index?today=1" class="menu-link">
+                        <div>روز جاری</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- transactions -->
+        <li class="menu-item ">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons fa fa-file-invoice-dollar"></i>
+                <div>تراکنش ها</div>
+            </a>
+
+            <ul class="menu-sub">
+                <li class="menu-item ">
+                    <a href="https://admin.parkwaykala.ir/admin/transactions" class="menu-link">
+                        <div> همه</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- tickets -->
+        <li class="menu-item ">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-support"></i>
+                <div>پشتیبانی</div>
+            </a>
+
+            <ul class="menu-sub">
+                <li class="menu-item ">
+                    <a href="https://admin.parkwaykala.ir/admin/tickets" class="menu-link">
+                        <div>لیست تیکت ها</div>
+                    </a>
+                </li>
+                <li class="menu-item ">
+                    <a href="https://admin.parkwaykala.ir/admin/tickets/create" class="menu-link">
+                        <div>افزودن تیکت</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- vendors -->
+
+        <li class="menu-item ">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bxs-shopping-bags"></i>
+                <div>امور فروشگاه ها</div>
+            </a>
+            <ul class="menu-sub">
+
+                <li class="menu-item ">
+                    <a href="https://admin.parkwaykala.ir/admin/vendors" class="menu-link">
+                        <div>لیست</div>
+                    </a>
+                </li>
+
+                <li class="menu-item ">
+                    <a href="https://admin.parkwaykala.ir/admin/vendors/management" class="menu-link">
+                        <div>ویرایش مدیران فروشگاه</div>
+                    </a>
+                </li>
+
+            </ul>
+
+        </li>
+
+        <li class="menu-item">
+            <a href="https://admin.parkwaykala.ir/admin/sponsors" class="menu-link ">
+                <i class="menu-icon tf-icons bx bx-money"></i>
+                <div>امور اسپانسرها</div>
+            </a>
+        </li>
+
+        <li class="menu-item">
+            <a href="https://admin.parkwaykala.ir/admin/settings" class="menu-link ">
+                <i class="menu-icon tf-icons bx bx-cog"></i>
+                <div>تنظیمات</div>
+            </a>
+        </li>
+    </ul>
+    <div style="position: relative; bottom: 0; right: 5px">
+        <div>
+            <h6 class="d-inline-block">تعداد پیامک باقیمانده:</h6>
+            <span>9,574</span>
+        </div>
+        <hr class="m-0">
+        <div>
+            <h6 class="d-inline-block">بروزرسانی در: </h6>
+            <span>
+                <bdi>1405/07/06 16:45:45</bdi>
+            </span>
+            <a class="btn btn-sm" href="https://admin.parkwaykala.ir/admin/sms/credit" data-bs-toggle="tooltip" title="بروزرسانی">
+                <i class="fa fa-refresh"></i>
+            </a>
+        </div>
+    </div>
+</aside>
+        <!-- / Menu -->
+
+        <!-- Layout container -->
+        <div class="layout-page">
+            <!-- Navbar -->
+
+            <nav class="layout-navbar navbar navbar-expand-xl align-items-center bg-navbar-theme unless-print" id="layout-navbar">
+    <div class="container-fluid">
+        <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+            <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+                <i class="bx bx-menu bx-sm"></i>
+            </a>
+        </div>
+
+        <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+            <!-- Search -->
+
+            <!-- /Search -->
+
+            <ul class="navbar-nav flex-row align-items-center ms-auto">
+
+                <!-- Style Switcher -->
+                <li class="nav-item me-2 me-xl-0">
+                    <a class="nav-link style-switcher-toggle hide-arrow" href="javascript:void(0);">
+                        <i class="bx bx-sm"></i>
+                    </a>
+                </li>
+                <!--/ Style Switcher -->
+
+
+                <!-- Notification -->
+                <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-2">
+                    <a class="nav-link dropdown-toggle hide-arrow" href="https://admin.parkwaykala.ir/admin/tickets" aria-expanded="false">
+                        <i class="bx bx-bell bx-sm"></i>
+                        <span class="badge bg-danger rounded-pill badge-notifications">8</span>
+                    </a>
+                </li>
+                <!--/ Notification -->
+
+                <!-- User -->
+                <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                    <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+                        <div class="avatar avatar-online">
+                            <img src="https://admin.parkwaykala.ir/assets/img/avatars/avatardefault.png" alt class="rounded-circle">
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="pages-account-settings-account.html">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0 me-3">
+                                        <div class="avatar avatar-online mt-1">
+                                            <img src="https://admin.parkwaykala.ir/assets/img/avatars/avatardefault.png" alt class="rounded-circle">
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <span class="fw-semibold d-block"></span>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <div class="dropdown-divider"></div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="https://admin.parkwaykala.ir/admin/profile">
+                                <i class="bx bx-user me-2"></i>
+                                <span class="align-middle">پروفایل من</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <div class="dropdown-divider"></div>
+                        </li>
+                        <li>
+                            <form method="post" action="https://admin.parkwaykala.ir/admin/logout">
+                                <input type="hidden" name="_token" value="CTBTaLAJuPoIUCies7LTAn6FXcs7wbGn0j79ggCZ" autocomplete="off">
+                                <button class="dropdown-item" type="submit"> <i class="bx bxs-log-out-circle me-2"></i> خروج</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                <!--/ User -->
+            </ul>
+        </div>
+
+        <!-- Search Small Screens -->
+        <div class="navbar-search-wrapper search-input-wrapper d-none">
+            <input type="text" class="form-control search-input container-fluid border-0" placeholder="جستجو ..." aria-label="Search...">
+            <i class="bx bx-x bx-sm search-toggler cursor-pointer"></i>
+        </div>
+    </div>
+</nav>
+            <!-- / Navbar -->
+
+            <!-- Content wrapper -->
+            <div class="content-wrapper">
+                <!-- Content -->
+
+                    <div class="watermark"> فروشگاه پارک وی کالا</div>
+
+    <div class="print-only-header" style="justify-content: space-between; align-items: center;">
+        <h4 class="d-inline-block">
+            <a href="http://localhost">
+                 فروشگاه پارک وی کالا
+            </a>
+        </h4>
+        <a href="http://localhost">
+            <img src="https://admin.parkwaykala.ir/logo.png" style="max-width: 240px;max-height: 180px">
+        </a>
+        <span class="d-inline-block rtl">تاریخ و ساعت گزارش:  13:14:58 - 1405/07/07</span>
+    </div>
+    <div class="content-wrapper">
+        <!-- Content -->
+            <!-- Bootstrap Dark Table -->
+            <div class="card">
+                <div class="d-flex align-items-baseline flex-column flex-md-row">
+                    <div class="col text-right">
+                        <h5 class="card-header card-header-px-0">لیست اقساط پرونده شماره 104873 <span > (سهیلا شیبانی پور)</span></h5>
+                    </div>
+                    <div class="col-auto my-2 mx-1 unless-print">
+                        <a class="btn btn-danger" href="https://admin.parkwaykala.ir/admin/loans/settled">بازگشت به لیست</a>
+                        <button class="btn btn-info" onclick="page_print()" >چاپ</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-dark">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th class="px-lg-0">مبلغ قسط</th>
+                            <th class="px-lg-0">مبلغ جریمه</th>
+                            <th class="px-lg-0">مبلغ پرداختی</th>
+                            <th class="px-lg-0">وضعیت</th>
+                            <th class="px-lg-0">زمان پرداخت</th>
+
+                        </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0">
+                                                                                <tr>
+                                <td class=""> 1</td>
+                                <td class="px-lg-0">74,600,000</td>
+                                <td class="px-lg-0">4,394,500</td>
+                                <td class="px-lg-0">78,994,500</td>
+                                <td class="px-lg-0">
+                                  <span class="badge text-light">  تسویه شده</span>
+                                </td>
+
+                                <td class="px-lg-0">
+                                    <bdi>
+                                        1405/01/20 14:01:57
+                                    </bdi>
+                                </td>
+                            </tr>
+                                                                                <tr>
+                                <td class=""> 2</td>
+                                <td class="px-lg-0">74,600,000</td>
+                                <td class="px-lg-0">2,714,250</td>
+                                <td class="px-lg-0">77,314,250</td>
+                                <td class="px-lg-0">
+                                  <span class="badge text-light">  تسویه شده</span>
+                                </td>
+
+                                <td class="px-lg-0">
+                                    <bdi>
+                                        1405/02/05 21:53:48
+                                    </bdi>
+                                </td>
+                            </tr>
+                                                                                <tr>
+                                <td class=""> 3</td>
+                                <td class="px-lg-0">74,600,000</td>
+                                <td class="px-lg-0">904,750</td>
+                                <td class="px-lg-0">75,504,750</td>
+                                <td class="px-lg-0">
+                                  <span class="badge text-light">  تسویه شده</span>
+                                </td>
+
+                                <td class="px-lg-0">
+                                    <bdi>
+                                        1405/02/22 10:14:50
+                                    </bdi>
+                                </td>
+                            </tr>
+                                                                                <tr>
+                                <td class=""> 4</td>
+                                <td class="px-lg-0">74,600,000</td>
+                                <td class="px-lg-0">14,993,000</td>
+                                <td class="px-lg-0">89,593,000</td>
+                                <td class="px-lg-0">
+                                  <span class="badge text-light">  تسویه شده</span>
+                                </td>
+
+                                <td class="px-lg-0">
+                                    <bdi>
+                                        1405/07/07 07:56:20
+                                    </bdi>
+                                </td>
+                            </tr>
+                                                                                <tr>
+                                <td class=""> 5</td>
+                                <td class="px-lg-0">74,600,000</td>
+                                <td class="px-lg-0">10,986,250</td>
+                                <td class="px-lg-0">85,586,250</td>
+                                <td class="px-lg-0">
+                                  <span class="badge text-light">  تسویه شده</span>
+                                </td>
+
+                                <td class="px-lg-0">
+                                    <bdi>
+                                        1405/07/07 07:57:52
+                                    </bdi>
+                                </td>
+                            </tr>
+                                                                                <tr>
+                                <td class=""> 6</td>
+                                <td class="px-lg-0">74,600,000</td>
+                                <td class="px-lg-0">6,979,500</td>
+                                <td class="px-lg-0">81,579,500</td>
+                                <td class="px-lg-0">
+                                  <span class="badge text-light">  تسویه شده</span>
+                                </td>
+
+                                <td class="px-lg-0">
+                                    <bdi>
+                                        1405/07/07 07:59:19
+                                    </bdi>
+                                </td>
+                            </tr>
+                                                </tbody>
+                    </table>
+                </div>
+            </div>
+    </div>
+                <!-- / Content -->
+
+
+                <div class="content-backdrop fade"></div>
+            </div>
+            <!-- Content wrapper -->
+            <!-- Footer -->
+
+            <!-- / Footer -->
+        </div>
+        <!-- / Layout page -->
+
+    </div>
+
+    <!-- Overlay -->
+    <div class="layout-overlay layout-menu-toggle"></div>
+
+    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+    <div class="drag-target"></div>
+</div>
+<!-- / Layout wrapper -->
+<!-- Core JS -->
+<!-- build:js assets/vendor/js/core.js -->
+<script src="https://admin.parkwaykala.ir/assets/vendor/libs/jquery/jquery.js"></script>
+<script src="https://admin.parkwaykala.ir/assets/vendor/libs/popper/popper.js"></script>
+<script src="https://admin.parkwaykala.ir/assets/vendor/js/bootstrap.js"></script>
+
+
+
+
+
+
+
+<script src="https://admin.parkwaykala.ir/assets/vendor/js/menu.js"></script>
+<!-- endbuild -->
+
+<!-- Vendors JS -->
+
+
+<!-- Main JS -->
+<script src="https://admin.parkwaykala.ir/assets/js/main.js"></script>
+
+
+
+<script src="https://admin.parkwaykala.ir/assets/js/persian-date.js"></script>
+<script src="https://admin.parkwaykala.ir/assets/js/cleave.min.js"></script>
+<script src="https://admin.parkwaykala.ir/assets/js/toastr.min.js" ></script>
+
+<script>
+    window.language = `fa`;
+    $(document).ready(function() {
+        // Get the CSRF token from the meta tag
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+        // Set the CSRF token in the AJAX header
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-Token': `CTBTaLAJuPoIUCies7LTAn6FXcs7wbGn0j79ggCZ`
+            }
+        });
+
+       const dateMaskGlobal = document.querySelectorAll('.date-mask');
+        if (dateMaskGlobal) {
+            dateMaskGlobal.forEach(function (dateMask){
+                new Cleave(dateMask, {
+                    date: true,
+                    delimiter: '/',
+                    datePattern: ['Y', 'm', 'd']
+                });
+            })
+
+        }
+    });
+
+    //this function is added to handle forms that submit programmatically submit.
+    (function() {
+        // Store the original submit method
+        const originalSubmit = HTMLFormElement.prototype.submit;
+
+        // Override the submit method
+        HTMLFormElement.prototype.submit = function() {
+            // Custom logic before the form is submitted
+            // Store Cleave instances
+            var cleaveInstances = [];
+
+            // Initialize Cleave.js on input fields with class 'number-format'
+            document.querySelectorAll('.number-format').forEach(function (input) {
+                var cleave = new Cleave(input, {
+                    numeral: true,
+                    numeralThousandsGroupStyle: 'thousand'
+                });
+                cleaveInstances.push({input: input, cleave: cleave});
+            });
+
+            cleaveInstances.forEach(function (instance) {
+
+                // Remove formatting
+                instance.input.value = instance.cleave.getRawValue();
+            });
+
+
+            // Call the original submit method
+            originalSubmit.call(this);
+        };
+
+
+    })();
+
+    document.addEventListener('DOMContentLoaded', function() {
+        numberFormat();
+    });
+
+    function numberFormat(){
+        // Store Cleave instances
+        var cleaveInstances = [];
+
+        // Initialize Cleave.js on input fields with class 'number-format'
+        document.querySelectorAll('.number-format').forEach(function(input) {
+            var cleave = new Cleave(input, {
+                numeral: true,
+                numeralThousandsGroupStyle: 'thousand'
+            });
+            cleaveInstances.push({input: input, cleave: cleave});
+        });
+
+        // Attach submit event listener to all forms
+        document.querySelectorAll('form').forEach(function(form) {
+
+            form.addEventListener('submit', function(event) {
+
+                cleaveInstances.forEach(function(instance) {
+
+                    // Remove formatting
+                    instance.input.value = instance.cleave.getRawValue();
+                });
+            });
+        });
+    }
+
+    // Initialize Bootstrap tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+
+
+<script>
+
+    // set custom validation message for html inputs
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var elements = document.getElementsByTagName("INPUT");
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].oninvalid = function(e) {
+                e.target.setCustomValidity("");
+                if (!e.target.validity.valid) {
+                    e.target.setCustomValidity("این فیلد نمیتواند خالی باشد.");
+                }
+            };
+            elements[i].oninput = function(e) {
+                e.target.setCustomValidity("");
+            };
+        }
+    });
+
+
+    function enableArrowKeyNavigation(formId) {
+        var form = $('#' + formId);
+        form.keydown(function (e) {
+            // Select all form inputs, selects, and textareas
+            var inputs = form.find('input, select, textarea');
+
+            // Get the index of the current input
+            var currentIdx = inputs.index(e.target);
+
+            // Check which key is pressed
+            if (e.keyCode == 39 || e.keyCode == 38) {
+// Right arrow key or Up arrow key
+                if (currentIdx > 0) {
+                    inputs.eq(currentIdx - 1).focus();
+                }
+            } else if (e.keyCode == 37 || e.keyCode == 40) {
+// Left arrow key or Down arrow key
+                if (currentIdx < inputs.length - 1) {
+                    inputs.eq(currentIdx + 1).focus();
+                }
+            }
+        });
+    }
+
+    function loadingProgress(status = true){
+        const loadingEl = $("#loading-overlay");
+        if (status){
+            loadingEl.removeClass('hidden');
+        }else {
+            loadingEl.addClass('hidden');
+        }
+    }
+</script>
+
+    <script>
+        function page_print(){
+            const originalTitle = document.title;
+            document.title = "سهیلا شیبانی پور";
+            window.print();
+            document.title = originalTitle;
+        }
+    </script>
+
+</body>
+</html>

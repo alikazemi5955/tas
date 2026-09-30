@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>سامانه مدیریت پرونده‌های تسویه شده و تراکنش‌ها - پارک‌وی کالا</title>
+    <meta name="description" content="سامانه خودکار استخراج و مدیریت پرونده‌های تسویه شده و تراکنش‌های پنل ادمین پارک‌وی کالا، تولید کارت‌های پرداخت اقساط و بایگانی روزانه" />
+    <meta property="og:title" content="سامانه مدیریت پرونده‌های تسویه شده و تراکنش‌ها - پارک‌وی کالا" />
+    <meta property="og:description" content="سامانه خودکار استخراج و مدیریت پرونده‌های تسویه شده و تراکنش‌های پنل ادمین پارک‌وی کالا، تولید کارت‌های پرداخت اقساط و بایگانی روزانه" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://admin.parkwaykala.ir/assets/vendor/fonts/farsi-fonts-styles-fa-num/primary-iran-yekan.css" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <meta name="theme-color" content="#1e293b" />
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+  </head>
+  <body class="bg-[#f8fafc] text-slate-800 font-['Vazirmatn',system-ui,sans-serif] antialiased min-h-screen selection:bg-amber-100 selection:text-amber-900">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

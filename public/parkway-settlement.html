@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سامانه تسویه اقساط پارک‌وی کالا (نسخه مستقل دسکتاپ)</title>
+  <style>
+    /* Reset & Base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Tahoma, Arial, sans-serif;
+    }
+    body {
+      background-color: #192233;
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+    }
+    
+    /* Header */
+    header {
+      background-color: #212b40;
+      border-bottom: 1px solid #2b374e;
+      padding: 12px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #d97706, #b45309);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 18px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+    .brand-subtitle {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .sync-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      background-color: #064e3b;
+      color: #34d399;
+      border: 1px solid #059669;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .count-badge {
+      padding: 5px 12px;
+      border-radius: 9999px;
+      background-color: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Control Bar */
+    .controls-bar {
+      background-color: #20293d;
+      border: 1px solid #2b374e;
+      border-radius: 12px 12px 0 0;
+      padding: 16px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .controls-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .controls-title small {
+      font-size: 12px;
+      font-weight: 400;
+      color: #94a3b8;
+    }
+    .search-input-wrap {
+      position: relative;
+      width: 300px;
+      max-width: 100%;
+    }
+    .search-input {
+      width: 100%;
+      background-color: #192233;
+      border: 1px solid #33415c;
+      color: #f1f5f9;
+      border-radius: 8px;
+      padding: 8px 36px 8px 12px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus {
+      border-color: #f59e0b;
+    }
+    .search-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: #64748b;
+      pointer-events: none;
+    }
+
+    /* Table Container */
+    .table-container {
+      background-color: #20293d;
+      border: 1px solid #2b374e;
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+    .table-scroll {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+      font-size: 13px;
+    }
+    thead th {
+      background-color: #212b40;
+      color: #cbd5e1;
+      font-weight: 700;
+      padding: 12px 16px;
+      border-bottom: 1px solid #2b374e;
+      border-left: 1px solid #2b374e;
+      white-space: nowrap;
+      user-select: none;
+    }
+    thead th.sortable {
+      cursor: pointer;
+      transition: background-color 0.15s;
+    }
+    thead th.sortable:hover {
+      background-color: #27344e;
+    }
+    tbody tr {
+      background-color: #20293d;
+      border-bottom: 1px solid #2b374e;
+      transition: background-color 0.15s;
+    }
+    tbody tr:hover {
+      background-color: #26334a;
+    }
+    tbody td {
+      padding: 14px 16px;
+      border-left: 1px solid #2b374e;
+      color: #e2e8f0;
+      white-space: nowrap;
+    }
+    tbody td.text-center, thead th.text-center {
+      text-align: center;
+    }
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    /* Action Buttons in Table */
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background-color: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .action-btn:hover {
+      color: #ffffff;
+      background-color: #334155;
+    }
+
+    /* Pagination */
+    .pagination-bar {
+      background-color: #212b40;
+      border-top: 1px solid #2b374e;
+      padding: 14px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+    }
+    .pagination-info {
+      color: #94a3b8;
+    }
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .page-btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      background-color: #192233;
+      border: 1px solid #33415c;
+      color: #cbd5e1;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .page-btn:hover:not(:disabled) {
+      background-color: #27344e;
+      color: #ffffff;
+    }
+    .page-btn.active {
+      background-color: #f59e0b;
+      color: #0f172a;
+      border-color: #f59e0b;
+      font-weight: 800;
+    }
+    .page-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background-color: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .modal-backdrop.hidden {
+      display: none;
+    }
+    .modal-box {
+      background-color: #ffffff;
+      border-radius: 14px;
+      max-width: 960px;
+      width: 100%;
+      max-height: 94vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .modal-header {
+      background-color: #283144;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: #ffffff;
+    }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+    .modal-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .btn-download {
+      background-color: #059669;
+      color: #ffffff;
+    }
+    .btn-download:hover {
+      background-color: #047857;
+    }
+    .btn-print {
+      background-color: #0891b2;
+      color: #ffffff;
+    }
+    .btn-print:hover {
+      background-color: #0e7490;
+    }
+    .btn-close {
+      background-color: #e11d48;
+      color: #ffffff;
+    }
+    .btn-close:hover {
+      background-color: #be123c;
+    }
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      background-color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .modal-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+      font-size: 13px;
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .modal-table thead tr {
+      background-color: #1e293b;
+      color: #ffffff;
+      border-bottom: 2px solid #0f172a;
+    }
+    .modal-table th {
+      padding: 12px 10px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .modal-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #1e293b;
+      font-weight: 600;
+    }
+    .card-preview-wrap {
+      display: flex;
+      justify-content: center;
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      overflow-x: auto;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #modal-content, #modal-content * {
+        visibility: visible;
+      }
+      #modal-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="brand-wrap">
+      <div class="brand-logo">PK</div>
+      <div>
+        <h1 class="brand-title">سامانه تسویه اقساط پارک‌وی کالا</h1>
+        <p class="brand-subtitle">نسخه دسکتاپ (اجرا در گوگل کروم - همگام‌سازی خودکار هر ۳۰ ثانیه)</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="sync-badge" title="هر ۳۰ ثانیه اطلاعات جدید به طور خودکار از پنل مدیریت دریافت می‌شود">
+        <span class="pulse-dot"></span>
+        <span id="sync-text">همگام‌سازی خودکار (۳۰ ثانیه)</span>
+      </div>
+      <span id="case-count-badge" class="count-badge">۱۰۸ پرونده</span>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main>
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+      <div class="controls-title">
+        <span>لیست پرونده‌های تسویه‌شده</span>
+        <small>(نمایش اطلاعات دریافتی از پنل پارک‌وی کالا)</small>
+      </div>
+
+      <!-- Search Input -->
+      <div class="search-input-wrap">
+        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input
+          type="text"
+          id="search-input"
+          class="search-input"
+          placeholder="جستجو نام مشتری، شماره پرونده..."
+        />
+      </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="table-container">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="toggleSort('caseId')" class="sortable text-center" style="width: 80px;">
+                <span>ID</span> <span id="sort-caseId" style="font-size: 10px; color: #94a3b8;">▲▼</span>
+              </th>
+              <th><span>نام کاربر</span></th>
+              <th onclick="toggleSort('caseNumber')" class="sortable text-center">
+                <span>شماره پرونده</span> <span id="sort-caseNumber" style="font-size: 10px; color: #94a3b8;">▲▼</span>
+              </th>
+              <th onclick="toggleSort('shopName')" class="sortable text-center">
+                <span>نام فروشگاه</span> <span id="sort-shopName" style="font-size: 10px; color: #94a3b8;">▲▼</span>
+              </th>
+              <th onclick="toggleSort('sponsor')" class="sortable text-center">
+                <span>اسپانسر</span> <span id="sort-sponsor" style="font-size: 10px; color: #94a3b8;">▲▼</span>
+              </th>
+              <th onclick="toggleSort('settlementDateTime')" class="sortable text-center">
+                <span>تاریخ تسویه</span> <span id="sort-settlementDateTime" style="font-size: 10px; color: #f59e0b; font-weight: bold;">▼</span>
+              </th>
+              <th class="text-center" style="width: 90px;"><span>دستور</span></th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-bar">
+        <div class="pagination-info" id="pagination-info">
+          در حال بارگذاری اطلاعات...
+        </div>
+        <div class="pagination-controls" id="pagination-controls">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal for Installments Breakdown & Designed Card -->
+  <div id="modal-container" class="modal-backdrop hidden">
+    <div id="modal-content" class="modal-box">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h2 id="modal-title" class="modal-title">لیست اقساط پرونده</h2>
+        <div class="modal-actions no-print">
+          <button id="modal-download-btn" class="modal-btn btn-download">
+            <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            <span>دانلود کارت</span>
+          </button>
+          <button onclick="window.print()" class="modal-btn btn-print">چاپ</button>
+          <button onclick="closeModal()" class="modal-btn btn-close">بازگشت به لیست</button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <!-- Installments Table -->
+        <div style="overflow-x: auto;">
+          <table class="modal-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>مبلغ قسط (ریال)</th>
+                <th>مبلغ جریمه (ریال)</th>
+                <th>مبلغ پرداختی (تومان)</th>
+                <th>وضعیت</th>
+                <th>زمان پرداخت</th>
+              </tr>
+            </thead>
+            <tbody id="modal-tbody">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Designed Settlement Slip Card (بدون باکس سورمه‌ای) -->
+        <div class="card-preview-wrap">
+          <div id="modal-card-svg-container">
+            <!-- SVG rendered by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Embedded Data Snapshot
+    const INITIAL_EMBEDDED_CASES = [{"caseId":"4911","caseNumber":"104873","customerName":"سهیلا شیبانی پور","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-07 07:59:22","settlementDate":"1405-07-07","contractNumber":"PK-104873","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-07 07:59:22","imageFilename":"سهیلا_شیبانی_پور_پرونده_4911.png","imagePath":"/storage/reports/سهیلا_شیبانی_پور_پرونده_4911.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-07 07:59:22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4443","caseNumber":"104405","customerName":"سهیلا شیبانی پور","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-07 07:54:31","settlementDate":"1405-07-07","contractNumber":"PK-104405","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-07 07:54:31","imageFilename":"سهیلا_شیبانی_پور_پرونده_4443.png","imagePath":"/storage/reports/سهیلا_شیبانی_پور_پرونده_4443.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-07 07:54:31","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"6026","caseNumber":"105988","customerName":"محمد نظری","shopName":"سرکاری","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-06 22:05:17","settlementDate":"1405-07-06","contractNumber":"PK-105988","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه سرکاری","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-06 22:05:17","imageFilename":"محمد_نظری_پرونده_6026.png","imagePath":"/storage/reports/محمد_نظری_پرونده_6026.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-06 22:05:17","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4193","caseNumber":"104155","customerName":"رودابه بهرامی فام","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-06 19:02:24","settlementDate":"1405-07-06","contractNumber":"PK-104155","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-06 19:02:24","imageFilename":"رودابه_بهرامی_فام_پرونده_4193.png","imagePath":"/storage/reports/رودابه_بهرامی_فام_پرونده_4193.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-06 19:02:24","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5309","caseNumber":"105271","customerName":"فاطمه دهقان","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-06 10:59:48","settlementDate":"1405-07-06","contractNumber":"PK-105271","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-06 10:59:48","imageFilename":"فاطمه_دهقان_پرونده_5309.png","imagePath":"/storage/reports/فاطمه_دهقان_پرونده_5309.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-06 10:59:48","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5432","caseNumber":"105394","customerName":"ایمان زارع","shopName":"عباسی (مرودشت)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-05 18:23:38","settlementDate":"1405-07-05","contractNumber":"PK-105394","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه عباسی (مرودشت)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-05 18:23:38","imageFilename":"ایمان_زارع_پرونده_5432.png","imagePath":"/storage/reports/ایمان_زارع_پرونده_5432.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-05 18:23:38","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5174","caseNumber":"105136","customerName":"زینب طیبی","shopName":"فروشگاه طیبی (صفاشهر)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-05 11:32:11","settlementDate":"1405-07-05","contractNumber":"PK-105136","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه طیبی (صفاشهر)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-05 11:32:11","imageFilename":"زینب_طیبی_پرونده_5174.png","imagePath":"/storage/reports/زینب_طیبی_پرونده_5174.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-05 11:32:11","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3866","caseNumber":"103828","customerName":"لاله زندی لک","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-05 10:09:00","settlementDate":"1405-07-05","contractNumber":"PK-103828","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-05 10:09:00","imageFilename":"لاله_زندی_لک_پرونده_3866.png","imagePath":"/storage/reports/لاله_زندی_لک_پرونده_3866.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-05 10:09:00","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5210","caseNumber":"105172","customerName":"محمد صادقی","shopName":"فروشگاه یزدانی (کنسول های بازی)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-04 13:55:58","settlementDate":"1405-07-04","contractNumber":"PK-105172","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه یزدانی (کنسول های بازی)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-04 13:55:58","imageFilename":"محمد_صادقی_پرونده_5210.png","imagePath":"/storage/reports/محمد_صادقی_پرونده_5210.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-04 13:55:58","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3691","caseNumber":"103654","customerName":"فاطمه صفری","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-02 20:23:45","settlementDate":"1405-07-02","contractNumber":"PK-103654","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-02 20:23:45","imageFilename":"فاطمه_صفری_پرونده_3691.png","imagePath":"/storage/reports/فاطمه_صفری_پرونده_3691.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-02 20:23:45","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3172","caseNumber":"103149","customerName":"مریم توسلی","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-02 16:11:36","settlementDate":"1405-07-02","contractNumber":"PK-103149","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-02 16:11:36","imageFilename":"مریم_توسلی_پرونده_3172.png","imagePath":"/storage/reports/مریم_توسلی_پرونده_3172.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-02 16:11:36","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4550","caseNumber":"104512","customerName":"عبداله اسماعیلی","shopName":"فروشگاه جعفری (قادراباد)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-02 12:51:54","settlementDate":"1405-07-02","contractNumber":"PK-104512","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه جعفری (قادراباد)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-02 12:51:54","imageFilename":"عبداله_اسماعیلی_پرونده_4550.png","imagePath":"/storage/reports/عبداله_اسماعیلی_پرونده_4550.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-02 12:51:54","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5759","caseNumber":"105721","customerName":"احمد محمودی","shopName":"کالای خانه رویایی (زمانی)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-01 23:12:09","settlementDate":"1405-07-01","contractNumber":"PK-105721","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه کالای خانه رویایی (زمانی)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-01 23:12:09","imageFilename":"احمد_محمودی_پرونده_5759.png","imagePath":"/storage/reports/احمد_محمودی_پرونده_5759.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-01 23:12:09","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5206","caseNumber":"105168","customerName":"بهنام خواجگان","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-01 21:58:59","settlementDate":"1405-07-01","contractNumber":"PK-105168","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-01 21:58:59","imageFilename":"بهنام_خواجگان_پرونده_5206.png","imagePath":"/storage/reports/بهنام_خواجگان_پرونده_5206.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-01 21:58:59","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5004","caseNumber":"104966","customerName":"سید حسن دوکوهکی","shopName":"فروشگاه فیروزی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-01 18:56:39","settlementDate":"1405-07-01","contractNumber":"PK-104966","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه فیروزی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-01 18:56:39","imageFilename":"سید_حسن_دوکوهکی_پرونده_5004.png","imagePath":"/storage/reports/سید_حسن_دوکوهکی_پرونده_5004.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-01 18:56:39","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5730","caseNumber":"105692","customerName":"محمد غلامی","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-01 15:47:07","settlementDate":"1405-07-01","contractNumber":"PK-105692","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-01 15:47:07","imageFilename":"محمد_غلامی_پرونده_5730.png","imagePath":"/storage/reports/محمد_غلامی_پرونده_5730.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-01 15:47:07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5703","caseNumber":"105665","customerName":"محمد رضا فهندژ","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-07-01 09:21:34","settlementDate":"1405-07-01","contractNumber":"PK-105665","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-07-01 09:21:34","imageFilename":"محمد_رضا_فهندژ_پرونده_5703.png","imagePath":"/storage/reports/محمد_رضا_فهندژ_پرونده_5703.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-07-01 09:21:34","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4001","caseNumber":"103963","customerName":"ابوالفضل میرزایی","shopName":"فروشگاه جعفری (قادراباد)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-30 23:36:53","settlementDate":"1405-06-30","contractNumber":"PK-103963","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه جعفری (قادراباد)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-30 23:36:53","imageFilename":"ابوالفضل_میرزایی_پرونده_4001.png","imagePath":"/storage/reports/ابوالفضل_میرزایی_پرونده_4001.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-30 23:36:53","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5271","caseNumber":"105233","customerName":"سجاد میرزایی","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-30 20:19:06","settlementDate":"1405-06-30","contractNumber":"PK-105233","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-30 20:19:06","imageFilename":"سجاد_میرزایی_پرونده_5271.png","imagePath":"/storage/reports/سجاد_میرزایی_پرونده_5271.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-30 20:19:06","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3555","caseNumber":"103520","customerName":"دردانه چهارده چریک","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-29 20:54:32","settlementDate":"1405-06-29","contractNumber":"PK-103520","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-29 20:54:32","imageFilename":"دردانه_چهارده_چریک_پرونده_3555.png","imagePath":"/storage/reports/دردانه_چهارده_چریک_پرونده_3555.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-29 20:54:32","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5775","caseNumber":"105737","customerName":"ایوب کریمی","shopName":"فروشگاه طیبی (صفاشهر)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-29 11:52:29","settlementDate":"1405-06-29","contractNumber":"PK-105737","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه طیبی (صفاشهر)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-29 11:52:29","imageFilename":"ایوب_کریمی_پرونده_5775.png","imagePath":"/storage/reports/ایوب_کریمی_پرونده_5775.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-29 11:52:29","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5314","caseNumber":"105276","customerName":"آرش رستگار","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-29 08:22:02","settlementDate":"1405-06-29","contractNumber":"PK-105276","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-29 08:22:02","imageFilename":"آرش_رستگار_پرونده_5314.png","imagePath":"/storage/reports/آرش_رستگار_پرونده_5314.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-29 08:22:02","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3657","caseNumber":"103620","customerName":"لیلا رضایی","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-28 10:33:50","settlementDate":"1405-06-28","contractNumber":"PK-103620","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-28 10:33:50","imageFilename":"لیلا_رضایی_پرونده_3657.png","imagePath":"/storage/reports/لیلا_رضایی_پرونده_3657.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-28 10:33:50","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4294","caseNumber":"104256","customerName":"ارسلان رئیسی","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-28 10:10:15","settlementDate":"1405-06-28","contractNumber":"PK-104256","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-28 10:10:15","imageFilename":"ارسلان_رئیسی_پرونده_4294.png","imagePath":"/storage/reports/ارسلان_رئیسی_پرونده_4294.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-28 10:10:15","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3803","caseNumber":"103766","customerName":"مهدی غلامی","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-26 19:06:43","settlementDate":"1405-06-26","contractNumber":"PK-103766","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-26 19:06:43","imageFilename":"مهدی_غلامی_پرونده_3803.png","imagePath":"/storage/reports/مهدی_غلامی_پرونده_3803.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-26 19:06:43","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5429","caseNumber":"105391","customerName":"امیر رضا شکرالهی","shopName":"فروشگاه طیبی (صفاشهر)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-26 13:08:41","settlementDate":"1405-06-26","contractNumber":"PK-105391","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه طیبی (صفاشهر)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-26 13:08:41","imageFilename":"امیر_رضا_شکرالهی_پرونده_5429.png","imagePath":"/storage/reports/امیر_رضا_شکرالهی_پرونده_5429.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-26 13:08:41","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5362","caseNumber":"105324","customerName":"علی معصومی","shopName":"اسپیکر قربانی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-26 10:59:30","settlementDate":"1405-06-26","contractNumber":"PK-105324","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه اسپیکر قربانی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-26 10:59:30","imageFilename":"علی_معصومی_پرونده_5362.png","imagePath":"/storage/reports/علی_معصومی_پرونده_5362.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-26 10:59:30","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4195","caseNumber":"104157","customerName":"زهرا رضایی","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-24 18:09:52","settlementDate":"1405-06-24","contractNumber":"PK-104157","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-24 18:09:52","imageFilename":"زهرا_رضایی_پرونده_4195.png","imagePath":"/storage/reports/زهرا_رضایی_پرونده_4195.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-24 18:09:52","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3743","caseNumber":"103706","customerName":"ژیلا احمدی","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-24 14:28:58","settlementDate":"1405-06-24","contractNumber":"PK-103706","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-24 14:28:58","imageFilename":"ژیلا_احمدی_پرونده_3743.png","imagePath":"/storage/reports/ژیلا_احمدی_پرونده_3743.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-24 14:28:58","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5216","caseNumber":"105178","customerName":"عنایت الله جمشیدی","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-23 20:27:25","settlementDate":"1405-06-23","contractNumber":"PK-105178","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-23 20:27:25","imageFilename":"عنایت_الله_جمشیدی_پرونده_5216.png","imagePath":"/storage/reports/عنایت_الله_جمشیدی_پرونده_5216.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-23 20:27:25","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3742","caseNumber":"103705","customerName":"نازنین پرهیزکار","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-23 13:50:24","settlementDate":"1405-06-23","contractNumber":"PK-103705","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-23 13:50:24","imageFilename":"نازنین_پرهیزکار_پرونده_3742.png","imagePath":"/storage/reports/نازنین_پرهیزکار_پرونده_3742.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-23 13:50:24","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5405","caseNumber":"105367","customerName":"مریم نیک نژاد","shopName":"پارک وی","sponsor":"کاظمی","settlementDateTime":"1405-06-21 01:33:40","settlementDate":"1405-06-21","contractNumber":"PK-105367","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-21 01:33:40","imageFilename":"مریم_نیک_نژاد_پرونده_5405.png","imagePath":"/storage/reports/مریم_نیک_نژاد_پرونده_5405.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-21 01:33:40","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5626","caseNumber":"105588","customerName":"صدیقه دهقانی","shopName":"فروشگاه چرخ خیاطی کاظم پور","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-20 23:26:34","settlementDate":"1405-06-20","contractNumber":"PK-105588","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه چرخ خیاطی کاظم پور","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-20 23:26:34","imageFilename":"صدیقه_دهقانی_پرونده_5626.png","imagePath":"/storage/reports/صدیقه_دهقانی_پرونده_5626.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-20 23:26:34","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5375","caseNumber":"105337","customerName":"عذری نخستین","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-20 08:38:27","settlementDate":"1405-06-20","contractNumber":"PK-105337","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-20 08:38:27","imageFilename":"عذری_نخستین_پرونده_5375.png","imagePath":"/storage/reports/عذری_نخستین_پرونده_5375.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-20 08:38:27","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5550","caseNumber":"105512","customerName":"عذری نخستین","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-18 18:40:27","settlementDate":"1405-06-18","contractNumber":"PK-105512","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-18 18:40:27","imageFilename":"عذری_نخستین_پرونده_5550.png","imagePath":"/storage/reports/عذری_نخستین_پرونده_5550.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-18 18:40:27","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5160","caseNumber":"105122","customerName":"عالم بها قربانی","shopName":"فروشگاه مرکزی (اقای جمالی)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-18 15:30:48","settlementDate":"1405-06-18","contractNumber":"PK-105122","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه مرکزی (اقای جمالی)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-18 15:30:48","imageFilename":"عالم_بها_قربانی_پرونده_5160.png","imagePath":"/storage/reports/عالم_بها_قربانی_پرونده_5160.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-18 15:30:48","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3731","caseNumber":"103694","customerName":"خدیجه سعادت","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-18 12:00:19","settlementDate":"1405-06-18","contractNumber":"PK-103694","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-18 12:00:19","imageFilename":"خدیجه_سعادت_پرونده_3731.png","imagePath":"/storage/reports/خدیجه_سعادت_پرونده_3731.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-18 12:00:19","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4698","caseNumber":"104660","customerName":"فاطمه روستا","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-18 10:12:47","settlementDate":"1405-06-18","contractNumber":"PK-104660","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-18 10:12:47","imageFilename":"فاطمه_روستا_پرونده_4698.png","imagePath":"/storage/reports/فاطمه_روستا_پرونده_4698.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-18 10:12:47","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4749","caseNumber":"104711","customerName":"معصومه رحیمی","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-17 19:57:01","settlementDate":"1405-06-17","contractNumber":"PK-104711","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-17 19:57:01","imageFilename":"معصومه_رحیمی_پرونده_4749.png","imagePath":"/storage/reports/معصومه_رحیمی_پرونده_4749.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-17 19:57:01","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3969","caseNumber":"103931","customerName":"نازنین پرهیزکار","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-17 14:04:22","settlementDate":"1405-06-17","contractNumber":"PK-103931","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-17 14:04:22","imageFilename":"نازنین_پرهیزکار_پرونده_3969.png","imagePath":"/storage/reports/نازنین_پرهیزکار_پرونده_3969.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-17 14:04:22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4756","caseNumber":"104718","customerName":"ابوالفضل تندرو","shopName":"فضیلتی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-16 20:01:56","settlementDate":"1405-06-16","contractNumber":"PK-104718","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فضیلتی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-16 20:01:56","imageFilename":"ابوالفضل_تندرو_پرونده_4756.png","imagePath":"/storage/reports/ابوالفضل_تندرو_پرونده_4756.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-16 20:01:56","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5292","caseNumber":"105254","customerName":"معصومه شکری","shopName":"پارک وی","sponsor":"کاظمی","settlementDateTime":"1405-06-16 18:14:08","settlementDate":"1405-06-16","contractNumber":"PK-105254","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-16 18:14:08","imageFilename":"معصومه_شکری_پرونده_5292.png","imagePath":"/storage/reports/معصومه_شکری_پرونده_5292.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-16 18:14:08","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5996","caseNumber":"105958","customerName":"مهدی زارعی","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-16 18:11:20","settlementDate":"1405-06-16","contractNumber":"PK-105958","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-16 18:11:20","imageFilename":"مهدی_زارعی_پرونده_5996.png","imagePath":"/storage/reports/مهدی_زارعی_پرونده_5996.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-16 18:11:20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5599","caseNumber":"105561","customerName":"فاطمه محمدی","shopName":"کلینیک دکتر لند","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-15 18:21:28","settlementDate":"1405-06-15","contractNumber":"PK-105561","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه کلینیک دکتر لند","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-15 18:21:28","imageFilename":"فاطمه_محمدی_پرونده_5599.png","imagePath":"/storage/reports/فاطمه_محمدی_پرونده_5599.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-15 18:21:28","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5177","caseNumber":"105139","customerName":"ثریا یونسی","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-15 14:28:04","settlementDate":"1405-06-15","contractNumber":"PK-105139","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-15 14:28:04","imageFilename":"ثریا_یونسی_پرونده_5177.png","imagePath":"/storage/reports/ثریا_یونسی_پرونده_5177.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-15 14:28:04","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4108","caseNumber":"104070","customerName":"فاطمه منفرد","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-15 12:21:16","settlementDate":"1405-06-15","contractNumber":"PK-104070","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-15 12:21:16","imageFilename":"فاطمه_منفرد_پرونده_4108.png","imagePath":"/storage/reports/فاطمه_منفرد_پرونده_4108.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-15 12:21:16","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4804","caseNumber":"104766","customerName":"سحر میرزایی","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-15 10:51:24","settlementDate":"1405-06-15","contractNumber":"PK-104766","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-15 10:51:24","imageFilename":"سحر_میرزایی_پرونده_4804.png","imagePath":"/storage/reports/سحر_میرزایی_پرونده_4804.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-15 10:51:24","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4942","caseNumber":"104904","customerName":"نرجس شاهین","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-15 10:39:26","settlementDate":"1405-06-15","contractNumber":"PK-104904","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-15 10:39:26","imageFilename":"نرجس_شاهین_پرونده_4942.png","imagePath":"/storage/reports/نرجس_شاهین_پرونده_4942.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-15 10:39:26","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4844","caseNumber":"104806","customerName":"مرتضی طهماسبی","shopName":"فروشگاه جعفری (قادراباد)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-14 22:56:12","settlementDate":"1405-06-14","contractNumber":"PK-104806","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه جعفری (قادراباد)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-14 22:56:12","imageFilename":"مرتضی_طهماسبی_پرونده_4844.png","imagePath":"/storage/reports/مرتضی_طهماسبی_پرونده_4844.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-14 22:56:12","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5009","caseNumber":"104971","customerName":"ریحانه دهقانی","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-14 17:13:43","settlementDate":"1405-06-14","contractNumber":"PK-104971","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-14 17:13:43","imageFilename":"ریحانه_دهقانی_پرونده_5009.png","imagePath":"/storage/reports/ریحانه_دهقانی_پرونده_5009.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-14 17:13:43","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5459","caseNumber":"105421","customerName":"جواد میر","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-14 13:29:54","settlementDate":"1405-06-14","contractNumber":"PK-105421","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-14 13:29:54","imageFilename":"جواد_میر_پرونده_5459.png","imagePath":"/storage/reports/جواد_میر_پرونده_5459.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-14 13:29:54","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4719","caseNumber":"104681","customerName":"نوروز کریمی","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-14 11:51:52","settlementDate":"1405-06-14","contractNumber":"PK-104681","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-14 11:51:52","imageFilename":"نوروز_کریمی_پرونده_4719.png","imagePath":"/storage/reports/نوروز_کریمی_پرونده_4719.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-14 11:51:52","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4292","caseNumber":"104254","customerName":"فاطمه نیازمند","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-14 11:31:09","settlementDate":"1405-06-14","contractNumber":"PK-104254","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-14 11:31:09","imageFilename":"فاطمه_نیازمند_پرونده_4292.png","imagePath":"/storage/reports/فاطمه_نیازمند_پرونده_4292.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-14 11:31:09","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5568","caseNumber":"105530","customerName":"ملیکا بارانی","shopName":"موبایل آلفا (بم)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-10 20:22:52","settlementDate":"1405-06-10","contractNumber":"PK-105530","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه موبایل آلفا (بم)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-10 20:22:52","imageFilename":"ملیکا_بارانی_پرونده_5568.png","imagePath":"/storage/reports/ملیکا_بارانی_پرونده_5568.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-10 20:22:52","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3757","caseNumber":"103720","customerName":"محمد زارع","shopName":"فروشگاه جعفری (قادراباد)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-10 18:35:48","settlementDate":"1405-06-10","contractNumber":"PK-103720","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه جعفری (قادراباد)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-10 18:35:48","imageFilename":"محمد_زارع_پرونده_3757.png","imagePath":"/storage/reports/محمد_زارع_پرونده_3757.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-10 18:35:48","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4149","caseNumber":"104111","customerName":"مریم فتوح آبادی","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-09 11:25:29","settlementDate":"1405-06-09","contractNumber":"PK-104111","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-09 11:25:29","imageFilename":"مریم_فتوح_آبادی_پرونده_4149.png","imagePath":"/storage/reports/مریم_فتوح_آبادی_پرونده_4149.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-09 11:25:29","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3469","caseNumber":"103446","customerName":"صادق انصاری","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-09 09:33:34","settlementDate":"1405-06-09","contractNumber":"PK-103446","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-09 09:33:34","imageFilename":"صادق_انصاری_پرونده_3469.png","imagePath":"/storage/reports/صادق_انصاری_پرونده_3469.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-09 09:33:34","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4107","caseNumber":"104069","customerName":"مازیار ملکی","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-09 03:14:48","settlementDate":"1405-06-09","contractNumber":"PK-104069","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-09 03:14:48","imageFilename":"مازیار_ملکی_پرونده_4107.png","imagePath":"/storage/reports/مازیار_ملکی_پرونده_4107.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-09 03:14:48","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"2948","caseNumber":"102925","customerName":"سهیل کنعانی","shopName":"فروشگاه آسنا (وثوق)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-08 09:59:46","settlementDate":"1405-06-08","contractNumber":"PK-102925","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه آسنا (وثوق)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-08 09:59:46","imageFilename":"سهیل_کنعانی_پرونده_2948.png","imagePath":"/storage/reports/سهیل_کنعانی_پرونده_2948.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-08 09:59:46","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3550","caseNumber":"103515","customerName":"سمیه حسنی","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-05 19:27:51","settlementDate":"1405-06-05","contractNumber":"PK-103515","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-05 19:27:51","imageFilename":"سمیه_حسنی_پرونده_3550.png","imagePath":"/storage/reports/سمیه_حسنی_پرونده_3550.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-05 19:27:51","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5586","caseNumber":"105548","customerName":"پیام رضایی","shopName":"عباسی (مرودشت)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-05 16:43:30","settlementDate":"1405-06-05","contractNumber":"PK-105548","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه عباسی (مرودشت)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-05 16:43:30","imageFilename":"پیام_رضایی_پرونده_5586.png","imagePath":"/storage/reports/پیام_رضایی_پرونده_5586.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-05 16:43:30","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3352","caseNumber":"103329","customerName":"زهرا امطعی","shopName":"فضیلتی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-05 12:36:11","settlementDate":"1405-06-05","contractNumber":"PK-103329","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فضیلتی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-05 12:36:11","imageFilename":"زهرا_امطعی_پرونده_3352.png","imagePath":"/storage/reports/زهرا_امطعی_پرونده_3352.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-05 12:36:11","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5093","caseNumber":"105055","customerName":"اسماعیل سلمانی","shopName":"کلینیک دکتر لند","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-05 09:39:16","settlementDate":"1405-06-05","contractNumber":"PK-105055","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه کلینیک دکتر لند","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-05 09:39:16","imageFilename":"اسماعیل_سلمانی_پرونده_5093.png","imagePath":"/storage/reports/اسماعیل_سلمانی_پرونده_5093.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-05 09:39:16","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5197","caseNumber":"105159","customerName":"محمد امین رضوی","shopName":"آرش ده بزرگی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-05 07:12:14","settlementDate":"1405-06-05","contractNumber":"PK-105159","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه آرش ده بزرگی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-05 07:12:14","imageFilename":"محمد_امین_رضوی_پرونده_5197.png","imagePath":"/storage/reports/محمد_امین_رضوی_پرونده_5197.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-05 07:12:14","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4762","caseNumber":"104724","customerName":"محمد تیموری نسب","shopName":"فروشگاه جعفری (قادراباد)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-04 13:56:44","settlementDate":"1405-06-04","contractNumber":"PK-104724","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه جعفری (قادراباد)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-04 13:56:44","imageFilename":"محمد_تیموری_نسب_پرونده_4762.png","imagePath":"/storage/reports/محمد_تیموری_نسب_پرونده_4762.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-04 13:56:44","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5226","caseNumber":"105188","customerName":"شیوا نیک نژاد","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-04 13:26:39","settlementDate":"1405-06-04","contractNumber":"PK-105188","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-04 13:26:39","imageFilename":"شیوا_نیک_نژاد_پرونده_5226.png","imagePath":"/storage/reports/شیوا_نیک_نژاد_پرونده_5226.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-04 13:26:39","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4304","caseNumber":"104266","customerName":"سهراب زارعی","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-03 19:59:40","settlementDate":"1405-06-03","contractNumber":"PK-104266","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-03 19:59:40","imageFilename":"سهراب_زارعی_پرونده_4304.png","imagePath":"/storage/reports/سهراب_زارعی_پرونده_4304.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-03 19:59:40","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5515","caseNumber":"105477","customerName":"فرزانه کشتکار","shopName":"طلای کیان","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-03 12:07:02","settlementDate":"1405-06-03","contractNumber":"PK-105477","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه طلای کیان","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-03 12:07:02","imageFilename":"فرزانه_کشتکار_پرونده_5515.png","imagePath":"/storage/reports/فرزانه_کشتکار_پرونده_5515.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-03 12:07:02","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5335","caseNumber":"105297","customerName":"مهدی دهقانیان","shopName":"عباسی (مرودشت)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-02 21:22:05","settlementDate":"1405-06-02","contractNumber":"PK-105297","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه عباسی (مرودشت)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-02 21:22:05","imageFilename":"مهدی_دهقانیان_پرونده_5335.png","imagePath":"/storage/reports/مهدی_دهقانیان_پرونده_5335.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-02 21:22:05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4940","caseNumber":"104902","customerName":"مینا رحمانیان","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-02 19:26:25","settlementDate":"1405-06-02","contractNumber":"PK-104902","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-02 19:26:25","imageFilename":"مینا_رحمانیان_پرونده_4940.png","imagePath":"/storage/reports/مینا_رحمانیان_پرونده_4940.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-02 19:26:25","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4925","caseNumber":"104887","customerName":"نرگس زینلی","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-02 09:08:38","settlementDate":"1405-06-02","contractNumber":"PK-104887","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-02 09:08:38","imageFilename":"نرگس_زینلی_پرونده_4925.png","imagePath":"/storage/reports/نرگس_زینلی_پرونده_4925.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-02 09:08:38","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5461","caseNumber":"105423","customerName":"محمد سجادیان","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-01 22:42:05","settlementDate":"1405-06-01","contractNumber":"PK-105423","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-01 22:42:05","imageFilename":"محمد_سجادیان_پرونده_5461.png","imagePath":"/storage/reports/محمد_سجادیان_پرونده_5461.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-01 22:42:05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5282","caseNumber":"105244","customerName":"مجید نعمت الهی","shopName":"شاکریان","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-01 22:17:01","settlementDate":"1405-06-01","contractNumber":"PK-105244","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه شاکریان","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-01 22:17:01","imageFilename":"مجید_نعمت_الهی_پرونده_5282.png","imagePath":"/storage/reports/مجید_نعمت_الهی_پرونده_5282.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-01 22:17:01","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3564","caseNumber":"103529","customerName":"معصومه کشاورز","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-01 20:04:23","settlementDate":"1405-06-01","contractNumber":"PK-103529","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-01 20:04:23","imageFilename":"معصومه_کشاورز_پرونده_3564.png","imagePath":"/storage/reports/معصومه_کشاورز_پرونده_3564.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-01 20:04:23","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3665","caseNumber":"103628","customerName":"حجت آبسواران","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-01 18:03:06","settlementDate":"1405-06-01","contractNumber":"PK-103628","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-01 18:03:06","imageFilename":"حجت_آبسواران_پرونده_3665.png","imagePath":"/storage/reports/حجت_آبسواران_پرونده_3665.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-01 18:03:06","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4576","caseNumber":"104538","customerName":"رامین عرب پور","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-01 17:36:10","settlementDate":"1405-06-01","contractNumber":"PK-104538","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-01 17:36:10","imageFilename":"رامین_عرب_پور_پرونده_4576.png","imagePath":"/storage/reports/رامین_عرب_پور_پرونده_4576.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-01 17:36:10","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4113","caseNumber":"104075","customerName":"خداداد رضایی","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-01 11:49:13","settlementDate":"1405-06-01","contractNumber":"PK-104075","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-01 11:49:13","imageFilename":"خداداد_رضایی_پرونده_4113.png","imagePath":"/storage/reports/خداداد_رضایی_پرونده_4113.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-01 11:49:13","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3354","caseNumber":"103331","customerName":"فضل الله میرزایی","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-01 10:35:02","settlementDate":"1405-06-01","contractNumber":"PK-103331","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-01 10:35:02","imageFilename":"فضل_الله_میرزایی_پرونده_3354.png","imagePath":"/storage/reports/فضل_الله_میرزایی_پرونده_3354.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-01 10:35:02","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3078","caseNumber":"103055","customerName":"زهرا حق شناس","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-06-01 10:23:46","settlementDate":"1405-06-01","contractNumber":"PK-103055","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-06-01 10:23:46","imageFilename":"زهرا_حق_شناس_پرونده_3078.png","imagePath":"/storage/reports/زهرا_حق_شناس_پرونده_3078.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-06-01 10:23:46","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5535","caseNumber":"105497","customerName":"امید عباسی","shopName":"فروشگاه یزدانی (کنسول های بازی)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-31 20:21:07","settlementDate":"1405-05-31","contractNumber":"PK-105497","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه یزدانی (کنسول های بازی)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-31 20:21:07","imageFilename":"امید_عباسی_پرونده_5535.png","imagePath":"/storage/reports/امید_عباسی_پرونده_5535.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-31 20:21:07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4568","caseNumber":"104530","customerName":"عبداله کارگر","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-31 18:59:43","settlementDate":"1405-05-31","contractNumber":"PK-104530","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-31 18:59:43","imageFilename":"عبداله_کارگر_پرونده_4568.png","imagePath":"/storage/reports/عبداله_کارگر_پرونده_4568.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-31 18:59:43","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"2852","caseNumber":"102829","customerName":"محمدجواد گودرزی","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-31 18:16:40","settlementDate":"1405-05-31","contractNumber":"PK-102829","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-31 18:16:40","imageFilename":"محمدجواد_گودرزی_پرونده_2852.png","imagePath":"/storage/reports/محمدجواد_گودرزی_پرونده_2852.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-31 18:16:40","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5476","caseNumber":"105438","customerName":"حلیمه بیات پور","shopName":"اهورا-تیون","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-30 19:53:29","settlementDate":"1405-05-30","contractNumber":"PK-105438","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه اهورا-تیون","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-30 19:53:29","imageFilename":"حلیمه_بیات_پور_پرونده_5476.png","imagePath":"/storage/reports/حلیمه_بیات_پور_پرونده_5476.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-30 19:53:29","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5010","caseNumber":"104972","customerName":"شهره روشن ضمیر","shopName":"فضیلتی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-30 13:35:39","settlementDate":"1405-05-30","contractNumber":"PK-104972","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فضیلتی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-30 13:35:39","imageFilename":"شهره_روشن_ضمیر_پرونده_5010.png","imagePath":"/storage/reports/شهره_روشن_ضمیر_پرونده_5010.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-30 13:35:39","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5617","caseNumber":"105579","customerName":"مریم صادقی","shopName":"عباسی (مرودشت)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-29 21:58:58","settlementDate":"1405-05-29","contractNumber":"PK-105579","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه عباسی (مرودشت)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-29 21:58:58","imageFilename":"مریم_صادقی_پرونده_5617.png","imagePath":"/storage/reports/مریم_صادقی_پرونده_5617.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-29 21:58:58","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4728","caseNumber":"104690","customerName":"محمد موسوی","shopName":"فروشگاه موبایل آرش","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-28 07:26:05","settlementDate":"1405-05-28","contractNumber":"PK-104690","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه موبایل آرش","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-28 07:26:05","imageFilename":"محمد_موسوی_پرونده_4728.png","imagePath":"/storage/reports/محمد_موسوی_پرونده_4728.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-28 07:26:05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5019","caseNumber":"104981","customerName":"خدیجه درخشان","shopName":"فضیلتی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-27 23:28:46","settlementDate":"1405-05-27","contractNumber":"PK-104981","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فضیلتی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-27 23:28:46","imageFilename":"خدیجه_درخشان_پرونده_5019.png","imagePath":"/storage/reports/خدیجه_درخشان_پرونده_5019.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-27 23:28:46","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5218","caseNumber":"105180","customerName":"موسی منجی","shopName":"فروشگاه طیبی (صفاشهر)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-27 20:55:50","settlementDate":"1405-05-27","contractNumber":"PK-105180","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه طیبی (صفاشهر)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-27 20:55:50","imageFilename":"موسی_منجی_پرونده_5218.png","imagePath":"/storage/reports/موسی_منجی_پرونده_5218.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-27 20:55:50","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5007","caseNumber":"104969","customerName":"سمیه مصلح","shopName":"فروشگاه موبایل آرش","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-27 12:38:05","settlementDate":"1405-05-27","contractNumber":"PK-104969","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه موبایل آرش","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-27 12:38:05","imageFilename":"سمیه_مصلح_پرونده_5007.png","imagePath":"/storage/reports/سمیه_مصلح_پرونده_5007.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-27 12:38:05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4313","caseNumber":"104275","customerName":"جواد جعفری","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-26 12:20:19","settlementDate":"1405-05-26","contractNumber":"PK-104275","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-26 12:20:19","imageFilename":"جواد_جعفری_پرونده_4313.png","imagePath":"/storage/reports/جواد_جعفری_پرونده_4313.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-26 12:20:19","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5479","caseNumber":"105441","customerName":"فاطمه میرزایی","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-26 08:28:56","settlementDate":"1405-05-26","contractNumber":"PK-105441","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-26 08:28:56","imageFilename":"فاطمه_میرزایی_پرونده_5479.png","imagePath":"/storage/reports/فاطمه_میرزایی_پرونده_5479.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-26 08:28:56","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4891","caseNumber":"104853","customerName":"محمد فهیمی پور","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-25 23:15:19","settlementDate":"1405-05-25","contractNumber":"PK-104853","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-25 23:15:19","imageFilename":"محمد_فهیمی_پور_پرونده_4891.png","imagePath":"/storage/reports/محمد_فهیمی_پور_پرونده_4891.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-25 23:15:19","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5092","caseNumber":"105054","customerName":"فاطمه تاجیک","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-25 18:17:34","settlementDate":"1405-05-25","contractNumber":"PK-105054","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-25 18:17:34","imageFilename":"فاطمه_تاجیک_پرونده_5092.png","imagePath":"/storage/reports/فاطمه_تاجیک_پرونده_5092.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-25 18:17:34","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5758","caseNumber":"105720","customerName":"ثریا علمداری","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-24 17:37:54","settlementDate":"1405-05-24","contractNumber":"PK-105720","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-24 17:37:54","imageFilename":"ثریا_علمداری_پرونده_5758.png","imagePath":"/storage/reports/ثریا_علمداری_پرونده_5758.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-24 17:37:54","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"3947","caseNumber":"103909","customerName":"ثریا علمداری","shopName":"پارک وی","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-24 16:27:03","settlementDate":"1405-05-24","contractNumber":"PK-103909","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه پارک وی","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-24 16:27:03","imageFilename":"ثریا_علمداری_پرونده_3947.png","imagePath":"/storage/reports/ثریا_علمداری_پرونده_3947.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-24 16:27:03","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4282","caseNumber":"104244","customerName":"زهرا یزدانی","shopName":"فروشگاه نگهداری (سعادتشهر)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-22 23:46:14","settlementDate":"1405-05-22","contractNumber":"PK-104244","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه نگهداری (سعادتشهر)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-22 23:46:14","imageFilename":"زهرا_یزدانی_پرونده_4282.png","imagePath":"/storage/reports/زهرا_یزدانی_پرونده_4282.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-22 23:46:14","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5198","caseNumber":"105160","customerName":"محمد رضا غریب پور","shopName":"فروشگاه یزدانی (کنسول های بازی)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-22 17:30:48","settlementDate":"1405-05-22","contractNumber":"PK-105160","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه فروشگاه یزدانی (کنسول های بازی)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-22 17:30:48","imageFilename":"محمد_رضا_غریب_پور_پرونده_5198.png","imagePath":"/storage/reports/محمد_رضا_غریب_پور_پرونده_5198.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-22 17:30:48","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4316","caseNumber":"104278","customerName":"مهدی داورپناه","shopName":"مهدی داورپناه (عصر جدید)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-21 03:01:05","settlementDate":"1405-05-21","contractNumber":"PK-104278","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه مهدی داورپناه (عصر جدید)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-21 03:01:05","imageFilename":"مهدی_داورپناه_پرونده_4316.png","imagePath":"/storage/reports/مهدی_داورپناه_پرونده_4316.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-21 03:01:05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"4400","caseNumber":"104362","customerName":"سوسن کاظمی","shopName":"گپ موبایل (قیروکارزین)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-20 12:59:46","settlementDate":"1405-05-20","contractNumber":"PK-104362","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه گپ موبایل (قیروکارزین)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-20 12:59:46","imageFilename":"سوسن_کاظمی_پرونده_4400.png","imagePath":"/storage/reports/سوسن_کاظمی_پرونده_4400.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-20 12:59:46","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]},{"caseId":"5408","caseNumber":"105370","customerName":"لیلا مختاری","shopName":"عباسی (مرودشت)","sponsor":"اسپانسر بقولی فرد","settlementDateTime":"1405-05-20 12:39:14","settlementDate":"1405-05-20","contractNumber":"PK-105370","nationalId":"5489627557","phone":"09177805129","installmentCount":6,"installmentAmountRial":74600000,"installmentAmountToman":7460000,"totalSettledRial":447600000,"totalSettledToman":44760000,"loanTitle":"تسهیلات خرید کالا - فروشگاه عباسی (مرودشت)","sourceUrl":"https://admin.parkwaykala.ir/admin/loans/settled","processingStatus":"PROCESSED","processedAt":"1405-05-20 12:39:14","imageFilename":"لیلا_مختاری_پرونده_5408.png","imagePath":"/storage/reports/لیلا_مختاری_پرونده_5408.png","discrepancyNote":null,"installments":[{"index":1,"paymentDate":"1405/01/20","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16001","status":"SETTLED"},{"index":2,"paymentDate":"1405/02/05","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16002","status":"SETTLED"},{"index":3,"paymentDate":"1405/02/22","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16003","status":"SETTLED"},{"index":4,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16004","status":"SETTLED"},{"index":5,"paymentDate":"1405/07/07","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16005","status":"SETTLED"},{"index":6,"paymentDate":"1405-05-20 12:39:14","amountRial":74600000,"amountToman":7460000,"trackingNumber":"TRX-16006","status":"SETTLED"}]}];
+
+    // Safe localStorage retrieval
+    let localSaved = null;
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const stored = localStorage.getItem('parkway_synced_cases');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            localSaved = parsed;
+          }
+        }
+      }
+    } catch(e) {
+      console.warn('localStorage read warning:', e);
+    }
+
+    let ALL_CASES = localSaved || INITIAL_EMBEDDED_CASES;
+
+    // State
+    let filteredCases = [...ALL_CASES];
+    let currentPage = 1;
+    const pageSize = 10;
+    let sortField = 'settlementDateTime';
+    let sortOrder = 'desc';
+    let currentSearchQuery = '';
+
+    // Remote Sync API URL (Absolute HTTPS to avoid null origin issue in file:// mode)
+    const REMOTE_API = 'https://ais-pre-oyaflwdhjw6yo5ep2jwhjc-171493547477.us-east1.run.app/api/cases';
+
+    // Persian Digits Helper
+    function toPersianDigits(n) {
+      if (n === null || n === undefined) return '';
+      const farsi = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+      return String(n).replace(/[0-9]/g, w => farsi[+w]);
+    }
+
+    function rialToToman(rial) {
+      if (!rial || isNaN(rial)) return 0;
+      return Math.floor(rial / 10);
+    }
+
+    function formatTomanWithSlash(num) {
+      const rounded = Math.round(num);
+      const formatted = rounded.toLocaleString('en-US').replace(/,/g, '/');
+      return toPersianDigits(formatted);
+    }
+
+    function sanitizeFileName(customerName, caseId, ext) {
+      ext = ext || 'png';
+      const cleanName = (customerName || 'مشتری').trim().replace(/[/\\?%*:|"<>]/g, '_').replace(/\s+/g, '_');
+      const cleanCaseId = (caseId || '').toString().trim().replace(/[/\\?%*:|"<>]/g, '_');
+      return cleanName + '_پرونده_' + cleanCaseId + '.' + ext;
+    }
+
+    // Card Vector SVG Generator
+    function generateCardSvg(c) {
+      const customerName = (c.customerName || 'مشتری گرامی').trim();
+      const actualInstallments = c.installments || [];
+      const installmentCount = actualInstallments.length > 0 
+        ? actualInstallments.length 
+        : (c.installmentCount || 1);
+
+      let singleAmountToman = c.installmentAmountToman || 0;
+      if (!singleAmountToman && c.installmentAmountRial) {
+        singleAmountToman = rialToToman(c.installmentAmountRial);
+      }
+      if (!singleAmountToman && actualInstallments.length > 0) {
+        const first = actualInstallments[0];
+        singleAmountToman = first.amountToman || first.paidAmountToman || rialToToman(first.amountRial || 0);
+      }
+      if (!singleAmountToman && c.totalSettledToman && installmentCount > 0) {
+        singleAmountToman = Math.round(c.totalSettledToman / installmentCount);
+      }
+
+      const formattedSingleAmount = singleAmountToman > 0
+        ? formatTomanWithSlash(singleAmountToman)
+        : '۰';
+        
+      const leftHeader = toPersianDigits(installmentCount) + ' * ' + formattedSingleAmount;
+
+      const rowHeight = 44;
+      const headerHeight = 52;
+      const margin = 8;
+      const col1Width = 56;
+      const col2Width = 196;
+      const col3Width = 208;
+      const tableWidth = col1Width + col2Width + col3Width;
+      const totalWidth = tableWidth + (margin * 2);
+      const totalHeight = headerHeight + (installmentCount * rowHeight) + (margin * 2);
+
+      const xCol1 = margin + col2Width + col3Width;
+      const xCol2 = margin + col3Width;
+      const xCol3 = margin;
+
+      let rowsSvg = '';
+      for (let i = 0; i < installmentCount; i++) {
+        const rowNum = i + 1;
+        const y = margin + headerHeight + (i * rowHeight);
+        const inst = actualInstallments[i];
+
+        let dateText = '';
+        if (inst && inst.paymentDate) {
+          const cleanDate = inst.paymentDate.split(' ')[0].replace(/-/g, '/');
+          const parts = cleanDate.split('/');
+          if (parts.length === 3) {
+            dateText = toPersianDigits(parts[0] + '/' + parseInt(parts[1], 10) + '/' + parseInt(parts[2], 10));
+          } else {
+            dateText = toPersianDigits(cleanDate);
+          }
+        } else if (c.settlementDate) {
+          const cleanDate = c.settlementDate.replace(/-/g, '/');
+          const parts = cleanDate.split('/');
+          if (parts.length === 3) {
+            dateText = toPersianDigits(parts[0] + '/' + parseInt(parts[1], 10) + '/' + parseInt(parts[2], 10));
+          } else {
+            dateText = toPersianDigits(cleanDate);
+          }
+        }
+
+        let amountText = '';
+        if (inst) {
+          let paidToman = 0;
+          if (inst.paidAmountToman && inst.paidAmountToman > 0) paidToman = inst.paidAmountToman;
+          else if (inst.paidAmountRial && inst.paidAmountRial > 0) paidToman = rialToToman(inst.paidAmountRial);
+          else if (inst.amountToman && inst.amountToman > 0) paidToman = inst.amountToman;
+          else if (inst.amountRial && inst.amountRial > 0) paidToman = rialToToman(inst.amountRial);
+          else paidToman = singleAmountToman;
+
+          if (paidToman > 0) amountText = formatTomanWithSlash(paidToman);
+        } else if (singleAmountToman > 0) {
+          amountText = formatTomanWithSlash(singleAmountToman);
+        }
+
+        rowsSvg += `
+          <g>
+            <rect x="${xCol1}" y="${y}" width="${col1Width}" height="${rowHeight}" fill="#ffb700" stroke="#000000" stroke-width="2" />
+            <text x="${xCol1 + (col1Width / 2)}" y="${y + 30}" font-family="'Vazirmatn', sans-serif" font-size="23" font-weight="900" fill="#000000" text-anchor="middle">
+              ${toPersianDigits(rowNum)}
+            </text>
+
+            <rect x="${xCol2}" y="${y}" width="${col2Width}" height="${rowHeight}" fill="#ffffff" stroke="#000000" stroke-width="2" />
+            <text x="${xCol2 + (col2Width / 2)}" y="${y + 29}" font-family="'Vazirmatn', sans-serif" font-size="20" font-weight="900" fill="#e60000" text-anchor="middle" direction="rtl">
+              ${dateText}
+            </text>
+
+            <rect x="${xCol3}" y="${y}" width="${col3Width}" height="${rowHeight}" fill="#ffffff" stroke="#000000" stroke-width="2" />
+            <text x="${xCol3 + (col3Width / 2)}" y="${y + 30}" font-family="'Vazirmatn', sans-serif" font-size="21" font-weight="900" fill="#0070ba" text-anchor="middle" direction="ltr">
+              ${amountText}
+            </text>
+          </g>
+        `;
+      }
+
+      return `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}" viewBox="0 0 ${totalWidth} ${totalHeight}" dir="rtl">
+          <rect x="0" y="0" width="${totalWidth}" height="${totalHeight}" fill="#ffffff" />
+          <rect x="${xCol1}" y="${margin}" width="${col1Width}" height="${headerHeight}" fill="#000000" stroke="#000000" stroke-width="2" />
+          <rect x="${xCol2}" y="${margin}" width="${col2Width}" height="${headerHeight}" fill="#f0ab82" stroke="#000000" stroke-width="2" />
+          <text x="${xCol2 + (col2Width / 2)}" y="${margin + 34}" font-family="'Vazirmatn', -apple-system, sans-serif" font-size="22" font-weight="900" fill="#000000" text-anchor="middle">
+            ${customerName}
+          </text>
+          <rect x="${xCol3}" y="${margin}" width="${col3Width}" height="${headerHeight}" fill="#f0ab82" stroke="#000000" stroke-width="2" />
+          <text x="${xCol3 + (col3Width / 2)}" y="${margin + 34}" font-family="'Vazirmatn', -apple-system, sans-serif" font-size="22" font-weight="900" fill="#000000" text-anchor="middle" direction="ltr">
+            ${leftHeader}
+          </text>
+          ${rowsSvg}
+        </svg>
+      `.trim();
+    }
+
+    // Download PNG from SVG
+    function downloadSvgAsPng(c) {
+      try {
+        const svgString = generateCardSvg(c);
+        const filename = sanitizeFileName(c.customerName, c.caseId, 'png');
+        const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        const URL = window.URL || window.webkitURL || window;
+        const blobURL = URL.createObjectURL(blob);
+        const image = new Image();
+        
+        image.onload = () => {
+          const scale = 2;
+          const canvas = document.createElement('canvas');
+          canvas.width = image.width * scale;
+          canvas.height = image.height * scale;
+          const ctx = canvas.getContext('2d');
+          ctx.scale(scale, scale);
+          ctx.drawImage(image, 0, 0);
+          
+          canvas.toBlob(pngBlob => {
+            if (!pngBlob) return;
+            const pngUrl = URL.createObjectURL(pngBlob);
+            const link = document.createElement('a');
+            link.href = pngUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(pngUrl);
+            URL.revokeObjectURL(blobURL);
+          }, 'image/png');
+        };
+        image.src = blobURL;
+      } catch (err) {
+        console.error('Download error:', err);
+      }
+    }
+
+    // Render Table
+    function renderTable() {
+      const tbody = document.getElementById('table-body');
+      if (!tbody) return;
+
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      const pageData = filteredCases.slice(start, end);
+
+      if (pageData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center" style="padding: 40px; color: #94a3b8;">هیچ پرونده‌ای یافت نشد.</td></tr>';
+        document.getElementById('pagination-info').innerText = '۰ پرونده';
+        document.getElementById('pagination-controls').innerHTML = '';
+        return;
+      }
+
+      let html = '';
+      for (let i = 0; i < pageData.length; i++) {
+        const c = pageData[i];
+        html += `
+          <tr>
+            <td class="text-center font-bold" style="font-family: sans-serif;">${toPersianDigits(c.caseId)}</td>
+            <td style="font-weight: 600;">${c.customerName || '-'}</td>
+            <td class="text-center" style="font-family: sans-serif;">${toPersianDigits(c.caseNumber || c.caseId)}</td>
+            <td class="text-center" style="color: #94a3b8;">${c.shopName || 'پارک وی'}</td>
+            <td class="text-center" style="color: #94a3b8;">${c.sponsor || 'اسپانسر بقولی فرد'}</td>
+            <td class="text-center" style="font-family: sans-serif;">${toPersianDigits(c.settlementDateTime || c.settlementDate || '')}</td>
+            <td class="text-center">
+              <button onclick="openModal('${c.caseId}')" class="action-btn" title="مشاهده اقساط">
+                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+              </button>
+              <button onclick="downloadRowCard('${c.caseId}')" class="action-btn" title="دانلود کارت">
+                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+              </button>
+            </td>
+          </tr>
+        `;
+      }
+      tbody.innerHTML = html;
+
+      // Pagination
+      const totalPages = Math.ceil(filteredCases.length / pageSize) || 1;
+      const infoEl = document.getElementById('pagination-info');
+      if (infoEl) {
+        infoEl.innerText = 'نمایش ' + toPersianDigits(start + 1) + ' تا ' + toPersianDigits(Math.min(end, filteredCases.length)) + ' از ' + toPersianDigits(filteredCases.length) + ' پرونده';
+      }
+      
+      let pBtns = `
+        <button onclick="changePage(${currentPage - 1})" class="page-btn" ${currentPage <= 1 ? 'disabled' : ''}>قبلی</button>
+      `;
+      for (let p = Math.max(1, currentPage - 2); p <= Math.min(totalPages, currentPage + 2); p++) {
+        pBtns += `<button onclick="changePage(${p})" class="page-btn ${p === currentPage ? 'active' : ''}">${toPersianDigits(p)}</button>`;
+      }
+      pBtns += `
+        <button onclick="changePage(${currentPage + 1})" class="page-btn" ${currentPage >= totalPages ? 'disabled' : ''}>بعدی</button>
+      `;
+      const ctrlEl = document.getElementById('pagination-controls');
+      if (ctrlEl) ctrlEl.innerHTML = pBtns;
+    }
+
+    function changePage(p) {
+      const totalPages = Math.ceil(filteredCases.length / pageSize) || 1;
+      if (p < 1 || p > totalPages) return;
+      currentPage = p;
+      renderTable();
+    }
+
+    function toggleSort(field) {
+      if (sortField === field) {
+        sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortField = field;
+        sortOrder = 'desc';
+      }
+
+      ['caseId', 'caseNumber', 'shopName', 'sponsor', 'settlementDateTime'].forEach(f => {
+        const el = document.getElementById('sort-' + f);
+        if (el) {
+          if (f === sortField) {
+            el.innerText = sortOrder === 'asc' ? '▲' : '▼';
+            el.style.color = '#f59e0b';
+            el.style.fontWeight = 'bold';
+          } else {
+            el.innerText = '▲▼';
+            el.style.color = '#94a3b8';
+            el.style.fontWeight = 'normal';
+          }
+        }
+      });
+
+      filteredCases.sort((a, b) => {
+        const valA = a[sortField] || '';
+        const valB = b[sortField] || '';
+        return sortOrder === 'asc' ? String(valA).localeCompare(String(valB), 'fa') : String(valB).localeCompare(String(valA), 'fa');
+      });
+
+      currentPage = 1;
+      renderTable();
+    }
+
+    // Modal
+    function openModal(caseId) {
+      const c = ALL_CASES.find(item => String(item.caseId) === String(caseId));
+      if (!c) return;
+
+      const caseNum = c.caseNumber || c.caseId;
+      document.getElementById('modal-title').innerText = 'لیست اقساط پرونده شماره ' + toPersianDigits(caseNum) + ' (' + c.customerName + ')';
+      
+      const installments = c.installments || [];
+      const singleInstRial = installments[0]?.amountRial || c.installmentAmountRial || 0;
+
+      let tbodyHtml = '';
+      if (installments.length > 0) {
+        installments.forEach((inst, idx) => {
+          const rowNum = inst.index || idx + 1;
+          const instRial = inst.amountRial || singleInstRial;
+          const penaltyRial = inst.penaltyAmountRial || 0;
+          const paidRial = inst.paidAmountRial || (instRial + penaltyRial);
+          const paidToman = inst.paidAmountToman || rialToToman(paidRial);
+
+          tbodyHtml += `
+            <tr>
+              <td>${toPersianDigits(rowNum)}</td>
+              <td>${toPersianDigits(instRial.toLocaleString('en-US'))}</td>
+              <td>${toPersianDigits(penaltyRial.toLocaleString('en-US'))}</td>
+              <td style="color: #1d4ed8; font-weight: 800;">${toPersianDigits(paidToman.toLocaleString('en-US'))} تومان</td>
+              <td><span style="color: #4b6584;">تسویه شده</span></td>
+              <td dir="ltr">${toPersianDigits(inst.paymentDate || c.settlementDateTime || '')}</td>
+            </tr>
+          `;
+        });
+      } else {
+        tbodyHtml = '<tr><td colspan="6" style="padding: 24px; color: #64748b;">اطلاعات اقساطی یافت نشد.</td></tr>';
+      }
+      document.getElementById('modal-tbody').innerHTML = tbodyHtml;
+
+      // Render Vector Graphic Card
+      document.getElementById('modal-card-svg-container').innerHTML = generateCardSvg(c);
+
+      document.getElementById('modal-download-btn').onclick = () => downloadSvgAsPng(c);
+      document.getElementById('modal-container').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-container').classList.add('hidden');
+    }
+
+    function downloadRowCard(caseId) {
+      const c = ALL_CASES.find(item => String(item.caseId) === String(caseId));
+      if (c) downloadSvgAsPng(c);
+    }
+
+    function applySearch(q) {
+      currentSearchQuery = q;
+      if (!q) {
+        filteredCases = [...ALL_CASES];
+      } else {
+        filteredCases = ALL_CASES.filter(c => {
+          return (
+            (c.customerName && c.customerName.toLowerCase().includes(q)) ||
+            (c.caseId && String(c.caseId).includes(q)) ||
+            (c.caseNumber && String(c.caseNumber).includes(q)) ||
+            (c.shopName && c.shopName.toLowerCase().includes(q)) ||
+            (c.sponsor && c.sponsor.toLowerCase().includes(q))
+          );
+        });
+      }
+      currentPage = 1;
+      renderTable();
+    }
+
+    // AUTOMATIC BACKGROUND SYNC EVERY 30 SECONDS
+    async function autoSyncWithServer() {
+      try {
+        const syncText = document.getElementById('sync-text');
+        if (syncText) syncText.innerText = 'در حال بررسی...';
+
+        const res = await fetch(REMOTE_API);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.success && Array.isArray(data.cases) && data.cases.length > 0) {
+            // Check if count or cases changed
+            if (data.cases.length !== ALL_CASES.length || JSON.stringify(data.cases[0]) !== JSON.stringify(ALL_CASES[0])) {
+              ALL_CASES = data.cases;
+              try {
+                localStorage.setItem('parkway_synced_cases', JSON.stringify(ALL_CASES));
+              } catch(e) {}
+              
+              applySearch(currentSearchQuery);
+              const badge = document.getElementById('case-count-badge');
+              if (badge) badge.innerText = toPersianDigits(ALL_CASES.length) + ' پرونده';
+            }
+          }
+        }
+      } catch (err) {
+        // Silently catch background network error (offline mode)
+      } finally {
+        const syncText = document.getElementById('sync-text');
+        if (syncText) syncText.innerText = 'همگام‌سازی خودکار (۳۰ ثانیه)';
+      }
+    }
+
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Initial Render
+      toggleSort('settlementDateTime');
+
+      // Update badge
+      const badge = document.getElementById('case-count-badge');
+      if (badge) badge.innerText = toPersianDigits(ALL_CASES.length) + ' پرونده';
+
+      // 2. Search
+      const searchEl = document.getElementById('search-input');
+      if (searchEl) {
+        searchEl.addEventListener('input', e => {
+          applySearch(e.target.value.trim().toLowerCase());
+        });
+      }
+
+      // 3. Modal close on backdrop
+      const modalEl = document.getElementById('modal-container');
+      if (modalEl) {
+        modalEl.addEventListener('click', e => {
+          if (e.target.id === 'modal-container') closeModal();
+        });
+      }
+      window.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeModal();
+      });
+
+      // 4. Start 30-second automated sync
+      setInterval(autoSyncWithServer, 30000);
+      // Run first check after 2 seconds
+      setTimeout(autoSyncWithServer, 2000);
+    });
+
+    // Fallback immediate execution in case DOMContentLoaded already fired
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      renderTable();
+    }
+  </script>
+</body>
+</html>
